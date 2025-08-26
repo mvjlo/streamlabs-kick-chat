@@ -68,7 +68,7 @@ function setAvatarForUser(username) {
   
   if (!avatarUrl) return;
   
-  for (let i = 0; i < Math.min(userMessages.length, 10); i++) {
+  for (let i = 0; i < Math.min(userMessages.length); i++) {
     const avatarImg = userMessages[i].querySelector('.avatar');
     if (avatarImg && avatarImg.src !== avatarUrl) {
       avatarImg.src = avatarUrl;
