@@ -6,11 +6,21 @@ let lastRequestTime = 0;
 
 const DEFAULT_AVATAR = 'https://upload.wikimedia.org/wikipedia/commons/2/26/2019147183134_2019-05-27_Fussball_1.FC_Kaiserslautern_vs_FC_Bayern_M%C3%BCnchen_-_Sven_-_1D_X_MK_II_-_0228_-_B70I8527_%28cropped%29.jpg';
 
+const MANUAL_AVATARS = {
+  'mvjloo': 'https://media.tenor.com/dfX_eFm86f4AAAAM/szczesny-szcz%C4%99sny.gif',
+};
+
 document.addEventListener('onEventReceived', function (obj) {
   if (obj.detail && obj.detail.command === 'message') {
     const username = obj.detail.from;
     
     if (requestQueue.has(username)) return;
+    
+    if (MANUAL_AVATARS[username.toLowerCase()]) {
+      avatarCache.set(username, MANUAL_AVATARS[username.toLowerCase()]);
+      setAvatarForUser(username);
+      return;
+    }
     
     if (avatarCache.has(username)) {
       setAvatarForUser(username);
@@ -31,6 +41,12 @@ async function fetchAvatarForUser(username) {
   requestQueue.add(username);
   
   try {
+    if (MANUAL_AVATARS[username.toLowerCase()]) {
+      avatarCache.set(username, MANUAL_AVATARS[username.toLowerCase()]);
+      setAvatarForUser(username);
+      return;
+    }
+    
     if (avatarCache.size >= MAX_CACHE_SIZE) {
       const firstKey = avatarCache.keys().next().value;
       avatarCache.delete(firstKey);
@@ -68,7 +84,7 @@ function setAvatarForUser(username) {
   
   if (!avatarUrl) return;
   
-  for (let i = 0; i < Math.min(userMessages.length); i++) {
+  for (let i = 0; i < userMessages.length; i++) {
     const avatarImg = userMessages[i].querySelector('.avatar');
     if (avatarImg && avatarImg.src !== avatarUrl) {
       avatarImg.src = avatarUrl;
