@@ -4,13 +4,50 @@ const MAX_CACHE_SIZE = 500;
 const REQUEST_DELAY = 100;
 let lastRequestTime = 0;
 
-const DEFAULT_AVATAR = 'https://upload.wikimedia.org/wikipedia/commons/2/26/2019147183134_2019-05-27_Fussball_1.FC_Kaiserslautern_vs_FC_Bayern_M%C3%BCnchen_-_Sven_-_1D_X_MK_II_-_0228_-_B70I8527_%28cropped%29.jpg';
+//API
+const TTV_API = 'ttvapi';
+const API_KEY = 'apikey';
+
+//AVATARS
+const DEFAULT_AVATAR = 'defaultlink';
+const MANUAL_AVATARS = {
+  
+};
+
+
+function findActualUsername(searchUsername) {
+  let messages = document.querySelectorAll(`[data-from="${searchUsername}"]`);
+  if (messages.length > 0) return searchUsername;
+  
+  const allMessages = document.querySelectorAll('[data-from]');
+  for (const msg of allMessages) {
+    const dataFrom = msg.getAttribute('data-from');
+    if (dataFrom.toLowerCase() === searchUsername.toLowerCase()) {
+      return dataFrom;
+    }
+  }
+  
+  return searchUsername;
+}
 
 document.addEventListener('onEventReceived', function (obj) {
   if (obj.detail && (obj.detail.command === 'message' || obj.detail.command === 'PRIVMSG')) {
     const username = obj.detail.from;
+    const command = obj.detail.command;
     
-    if (requestQueue.has(username)) return;
+    const actualUsername = findActualUsername(username);
+    const userMessages = document.querySelectorAll(`[data-from="${actualUsername}"]`);
+    const platformClass = command === 'message' ? 'platform-kick' : 'platform-twitch';
+    
+    userMessages.forEach(msg => {
+      if (!msg.classList.contains('platform-kick') && !msg.classList.contains('platform-twitch')) {
+        msg.classList.add(platformClass);
+      }
+    });
+    
+    const cacheKey = username.toLowerCase();
+    
+    if (requestQueue.has(cacheKey)) return;
     
     if (MANUAL_AVATARS[cacheKey]) {
       avatarCache.set(cacheKey, MANUAL_AVATARS[cacheKey]);
@@ -32,11 +69,20 @@ document.addEventListener('onEventReceived', function (obj) {
   }
 });
 
-async function fetchAvatarForUser(username) {
-  if (requestQueue.has(username)) return;
-  requestQueue.add(username);
+async function fetchAvatarForUser(username, command) {
+  const cacheKey = username.toLowerCase();
+  
+  if (requestQueue.has(cacheKey)) return;
+  requestQueue.add(cacheKey);
   
   try {
+    if (MANUAL_AVATARS[cacheKey]) {
+      avatarCache.set(cacheKey, MANUAL_AVATARS[cacheKey]);
+      const actualUsername = findActualUsername(username);
+      setAvatarForUser(actualUsername, cacheKey);
+      return;
+    }
+    
     if (avatarCache.size >= MAX_CACHE_SIZE) {
       const firstKey = avatarCache.keys().next().value;
       avatarCache.delete(firstKey);
