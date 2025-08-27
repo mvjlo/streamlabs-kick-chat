@@ -4,33 +4,85 @@ const MAX_CACHE_SIZE = 500;
 const REQUEST_DELAY = 100;
 let lastRequestTime = 0;
 
-const DEFAULT_AVATAR = 'https://upload.wikimedia.org/wikipedia/commons/2/26/2019147183134_2019-05-27_Fussball_1.FC_Kaiserslautern_vs_FC_Bayern_M%C3%BCnchen_-_Sven_-_1D_X_MK_II_-_0228_-_B70I8527_%28cropped%29.jpg';
+//API
+const TTV_API = 'ttvapi';
+const API_KEY = 'apikey';
+
+//AVATARS
+const DEFAULT_AVATAR = 'defaultlink';
+const MANUAL_AVATARS = {
+  
+};
+
+
+function findActualUsername(searchUsername) {
+  let messages = document.querySelectorAll(`[data-from="${searchUsername}"]`);
+  if (messages.length > 0) return searchUsername;
+  
+  const allMessages = document.querySelectorAll('[data-from]');
+  for (const msg of allMessages) {
+    const dataFrom = msg.getAttribute('data-from');
+    if (dataFrom.toLowerCase() === searchUsername.toLowerCase()) {
+      return dataFrom;
+    }
+  }
+  
+  return searchUsername;
+}
 
 document.addEventListener('onEventReceived', function (obj) {
-  if (obj.detail && obj.detail.command === 'message') {
+  if (obj.detail && (obj.detail.command === 'message' || obj.detail.command === 'PRIVMSG')) {
     const username = obj.detail.from;
+    const command = obj.detail.command;
     
-    if (requestQueue.has(username)) return;
+    const actualUsername = findActualUsername(username);
+    const userMessages = document.querySelectorAll(`[data-from="${actualUsername}"]`);
+    const platformClass = command === 'message' ? 'platform-kick' : 'platform-twitch';
     
-    if (avatarCache.has(username)) {
-      setAvatarForUser(username);
+    userMessages.forEach(msg => {
+      if (!msg.classList.contains('platform-kick') && !msg.classList.contains('platform-twitch')) {
+        msg.classList.add(platformClass);
+      }
+    });
+    
+    const cacheKey = username.toLowerCase();
+    
+    if (requestQueue.has(cacheKey)) return;
+    
+    if (MANUAL_AVATARS[cacheKey]) {
+      avatarCache.set(cacheKey, MANUAL_AVATARS[cacheKey]);
+      setAvatarForUser(actualUsername, cacheKey);
+      return;
+    }
+    
+    if (avatarCache.has(cacheKey)) {
+      setAvatarForUser(actualUsername, cacheKey);
     } else {
       const now = Date.now();
       if (now - lastRequestTime > REQUEST_DELAY) {
-        fetchAvatarForUser(username);
+        fetchAvatarForUser(username, command);
         lastRequestTime = now;
       } else {
-        setTimeout(() => fetchAvatarForUser(username), REQUEST_DELAY);
+        setTimeout(() => fetchAvatarForUser(username, command), REQUEST_DELAY);
       }
     }
   }
 });
 
-async function fetchAvatarForUser(username) {
-  if (requestQueue.has(username)) return;
-  requestQueue.add(username);
+async function fetchAvatarForUser(username, command) {
+  const cacheKey = username.toLowerCase();
+  
+  if (requestQueue.has(cacheKey)) return;
+  requestQueue.add(cacheKey);
   
   try {
+    if (MANUAL_AVATARS[cacheKey]) {
+      avatarCache.set(cacheKey, MANUAL_AVATARS[cacheKey]);
+      const actualUsername = findActualUsername(username);
+      setAvatarForUser(actualUsername, cacheKey);
+      return;
+    }
+    
     if (avatarCache.size >= MAX_CACHE_SIZE) {
       const firstKey = avatarCache.keys().next().value;
       avatarCache.delete(firstKey);
@@ -39,36 +91,53 @@ async function fetchAvatarForUser(username) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 3000);
     
-    const response = await fetch(
-      'https://kick.com/api/v2/channels/' + username.toLowerCase(), 
-      { signal: controller.signal }
-    );
+    let response;
+    
+    if (command === 'message') {
+      response = await fetch(
+        'https://kick.com/api/v2/channels/' + cacheKey, 
+        { signal: controller.signal }
+      );
+    } else if (command === 'PRIVMSG') {
+      response = await fetch(
+        TTV_API + cacheKey + '?api_key=' + API_KEY, 
+        { signal: controller.signal }
+      );
+    }
     
     clearTimeout(timeoutId);
     
     if (response.ok) {
       const data = await response.json();
-      const avatarUrl = data.user?.profile_pic || DEFAULT_AVATAR;
-      avatarCache.set(username, avatarUrl);
+      let avatarUrl = DEFAULT_AVATAR;
+      
+      if (command === 'message') {
+        avatarUrl = data.user?.profile_pic || DEFAULT_AVATAR;
+      } else if (command === 'PRIVMSG') {
+        avatarUrl = data.avatar || DEFAULT_AVATAR;
+      }
+      
+      avatarCache.set(cacheKey, avatarUrl);
     } else {
-      avatarCache.set(username, DEFAULT_AVATAR);
+      avatarCache.set(cacheKey, DEFAULT_AVATAR);
     }
     
   } catch (error) {
-    avatarCache.set(username, DEFAULT_AVATAR);
+    avatarCache.set(cacheKey, DEFAULT_AVATAR);
   } finally {
-    requestQueue.delete(username);
-    setAvatarForUser(username);
+    requestQueue.delete(cacheKey);
+    const actualUsername = findActualUsername(username);
+    setAvatarForUser(actualUsername, cacheKey);
   }
 }
 
-function setAvatarForUser(username) {
-  const userMessages = document.querySelectorAll('[data-from="' + username + '"]');
-  const avatarUrl = avatarCache.get(username);
+function setAvatarForUser(actualUsername, cacheKey) {
+  const userMessages = document.querySelectorAll(`[data-from="${actualUsername}"]`);
+  const avatarUrl = avatarCache.get(cacheKey);
   
   if (!avatarUrl) return;
   
-  for (let i = 0; i < Math.min(userMessages.length, 10); i++) {
+  for (let i = 0; i < userMessages.length; i++) {
     const avatarImg = userMessages[i].querySelector('.avatar');
     if (avatarImg && avatarImg.src !== avatarUrl) {
       avatarImg.src = avatarUrl;

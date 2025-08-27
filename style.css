@@ -34,16 +34,34 @@ body {
     width: fit-content !important;
     max-width: 80% !important;
     min-width: 250px !important;
-    background: rgba(32, 34, 37, 0.9) !important;
     backdrop-filter: blur(8px) !important;
     -webkit-backdrop-filter: blur(8px) !important;
     border-radius: 16px !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    padding: 20px 24px !important;
+}
+
+.chat-item.platform-twitch {
+    background: rgba(145, 70, 255, 0.65) !important;
     box-shadow: 
+        0 0 0 1px rgba(145, 70, 255, 0.3),
+        0 0 8px rgba(145, 70, 255, 0.2),
+        0 8px 20px rgba(145, 70, 255, 0.4),
         0 6px 16px rgba(0, 0, 0, 0.2),
+        0 4px 12px rgba(0, 0, 0, 0.15),
         0 3px 6px rgba(0, 0, 0, 0.15),
         inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
-    padding: 20px 24px !important;
+}
+
+.chat-item.platform-kick {
+    background: rgba(83, 217, 105, 0.65) !important;
+    box-shadow: 
+        0 0 0 1px rgba(83, 217, 105, 0.3),
+        0 0 8px rgba(83, 217, 105, 0.2),
+        0 8px 20px rgba(83, 217, 105, 0.4),
+        0 6px 16px rgba(0, 0, 0, 0.2),
+        0 4px 12px rgba(0, 0, 0, 0.15),
+        0 3px 6px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
 }
 
 .chat-item.deleted {
@@ -60,8 +78,28 @@ body {
     display: block !important;
     object-fit: cover !important;
     flex-shrink: 0 !important;
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.35) !important;
-    border: 2px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 
+        0 0 0 2px rgba(255, 255, 255, 0.2),
+        0 0 12px rgba(255, 255, 255, 0.3),
+        0 3px 12px rgba(0, 0, 0, 0.35) !important;
+}
+
+.platform-twitch .avatar {
+    box-shadow: 
+        0 0 0 3px #9146ff,
+        0 0 16px rgba(145, 70, 255, 0.8),
+        0 0 24px rgba(145, 70, 255, 0.6),
+        0 4px 16px rgba(145, 70, 255, 0.5),
+        0 2px 8px rgba(0, 0, 0, 0.4) !important;
+}
+
+.platform-kick .avatar {
+    box-shadow: 
+        0 0 0 3px #53d969,
+        0 0 16px rgba(83, 217, 105, 0.8),
+        0 0 24px rgba(83, 217, 105, 0.6),
+        0 4px 16px rgba(83, 217, 105, 0.5),
+        0 2px 8px rgba(0, 0, 0, 0.4) !important;
 }
 
 .content {
@@ -74,16 +112,24 @@ body {
     display: flex !important;
     align-items: center !important;
     gap: 8px !important;
+    height: 1.2rem !important;
 }
 
 .name {
-    font-weight: 600 !important;
+    font-weight: 700 !important;
     font-size: 1.2rem !important;
-    line-height: 1.4 !important;
+    line-height: 1.2 !important;
     margin: 0 !important;
-    display: inline-block !important;
+    display: inline-flex !important;
+    align-items: center !important;
     white-space: nowrap !important;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8) !important;
+    color: #ffffff !important;
+    text-shadow: 
+        0 2px 8px rgba(0, 0, 0, 0.9),
+        0 1px 4px rgba(0, 0, 0, 0.8),
+        1px 1px 2px rgba(0, 0, 0, 1),
+        -1px -1px 2px rgba(0, 0, 0, 1) !important;
+    height: 1.2rem !important;
 }
 
 .spel-badge {
@@ -115,27 +161,43 @@ body {
 }
 
 .message {
-    font-weight: 400 !important;
+    font-weight: 500 !important;
     font-size: 1.1rem !important;
-    line-height: 1.45 !important;
+    line-height: 1.6 !important;
     word-wrap: break-word !important;
     margin: 0 !important;
     padding: 0 !important;
-    color: rgba(255, 255, 255, 0.92) !important;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7) !important;
+    color: #ffffff !important;
+    text-shadow: 
+        0 2px 6px rgba(0, 0, 0, 0.9),
+        0 1px 3px rgba(0, 0, 0, 0.8),
+        1px 1px 2px rgba(0, 0, 0, 0.9),
+        -1px -1px 2px rgba(0, 0, 0, 0.9) !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 4px !important;
 }
 
 .emote {
-    display: inline-block;
-    vertical-align: baseline;
+    display: inline-block !important;
+    vertical-align: baseline !important;
+    margin: 0 4px !important;
+    flex-shrink: 0 !important;
+    background: none !important;
+    background-image: none !important;
 }
 
 .emote img {
-    height: 1.6rem !important;
+    height: 28px !important;
+    max-height: 32px !important;
+    max-width: 50px !important;
     width: auto !important;
-    vertical-align: middle !important;
+    vertical-align: text-bottom !important;
     opacity: 1 !important;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4)) !important;
+    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.7)) !important;
+    object-fit: contain !important;
+    display: block !important;
 }
 
 .badge {
@@ -143,44 +205,15 @@ body {
     margin-right: 6px;
     height: 1.2rem !important;
     vertical-align: middle;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5)) !important;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.7)) !important;
 }
 
 .message a {
-    color: #5bc0de !important;
+    color: #00bfff !important;
+    font-weight: 600 !important;
     text-decoration: none !important;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7) !important;
-}
-
-@media (max-width: 800px) {
-    .chat-item {
-        max-width: 90% !important;
-        min-width: 200px !important;
-        padding: 16px 20px !important;
-    }
-    
-    .avatar {
-        width: 48px !important;
-        height: 48px !important;
-        min-width: 48px !important;
-        min-height: 48px !important;
-    }
-    
-    .name {
-        font-size: 1.1rem !important;
-    }
-    
-    .message {
-        font-size: 1rem !important;
-    }
-    
-    .spel-badge {
-        font-size: 0.6rem !important;
-        padding: 2px 4px !important;
-        margin-left: 4px !important;
-    }
-    
-    #log {
-        padding: 0 16px 20px 16px;
-    }
+    text-shadow: 
+        0 2px 6px rgba(0, 0, 0, 0.9),
+        0 1px 3px rgba(0, 0, 0, 0.8),
+        1px 1px 2px rgba(0, 0, 0, 0.9) !important;
 }
