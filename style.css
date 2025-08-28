@@ -10,10 +10,11 @@
     bottom: 0;
     left: 0;
     padding: 0 24px 30px 24px;
-    width: 100%;
+    width: 39%;
     animation: simpleFloat 8s ease-in-out infinite;
 }
 
+/* Reszta twojego oryginalnego CSS bez zmian... */
 * {
     box-sizing: border-box;
 }
