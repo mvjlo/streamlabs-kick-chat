@@ -1,5 +1,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
+@keyframes simpleFloat {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+#log {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    padding: 0 24px 30px 24px;
+    width: 100%;
+    animation: simpleFloat 8s ease-in-out infinite;
+}
+
 * {
     box-sizing: border-box;
 }
@@ -17,14 +31,6 @@ body {
     font-size: {font_size};
     line-height: 1.4;
     color: {text_color};
-}
-
-#log {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    padding: 0 24px 30px 24px;
-    width: 100%;
 }
 
 .chat-item {
