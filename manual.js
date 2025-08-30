@@ -8,13 +8,13 @@ const MANUAL_AVATARS = {
 // 7TV EMOTES
 let kickSevenTVEmotes = {};
 let globalSevenTVEmotes = {};
-const KICK_NICK = ''; 
+const TTV_NICK = ''; 
 
 fetchKick7TVEmotes();
 
 async function fetchKick7TVEmotes() {
   try {
-    const chRes = await fetch(`https://api.streamelements.com/kappa/v2/channels/${KICK_NICK}`);
+    const chRes = await fetch(`https://api.streamelements.com/kappa/v2/channels/${TTV_NICK}`);
     if (!chRes.ok) return;
     const chJson = await chRes.json();
     const channelId = chJson._id;
