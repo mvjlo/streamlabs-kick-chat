@@ -8,13 +8,14 @@ let lastRequestTime = 0;
 const TTV_API = 'ttvapi';
 const API_KEY = 'apikey';
 
+//7TV EMOTES
+const TTV_NICK = '';
+
 //AVATARS
 const DEFAULT_AVATAR = 'defaultlink';
 const MANUAL_AVATARS = {
   
 };
-
-const TTV_NICK = '';
 
 function findActualUsername(searchUsername) {
   let messages = document.querySelectorAll(`[data-from="${searchUsername}"]`);
