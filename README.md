@@ -10,7 +10,7 @@ W pliku script.js uzupełnij zmienne
 
 `TTV_API`
 `API_KEY`
-
+`TTV_NICK`
 
 ## Ustawianie awatarów
 W pliku script.js
